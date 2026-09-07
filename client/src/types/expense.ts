@@ -16,3 +16,10 @@ export const ExpenseCategory = {
 } as const;
 
 export type ExpenseCategory = (typeof ExpenseCategory)[keyof typeof ExpenseCategory];
+
+export type AddExpenseForm = {
+  amount: number;
+  category: ExpenseCategory;
+  date: Date;
+  notes: string;
+}

@@ -1,16 +1,20 @@
-import { useEffect, useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { CalendarDays, Pencil, Trash } from "lucide-react";
-import { ExpenseCategory, type ExpenseProps } from "@/types/expense";
+import {
+  ExpenseCategory,
+  type ExpenseProps,
+  type AddExpenseForm,
+} from "@/types/expense";
 import { formatDate } from "@/utils/formatDate";
 import { mockExpenses } from "@/data/mockExpenses";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-// import { AddExpenseModal } from "@/components/AddExpenseModal";
+import { AddExpenseModal } from "@/components/AddExpenseModal";
 import { ExpenseFilter } from "@/components/ExpenseFilter";
 import { type DateRange } from "react-day-picker";
 
 function App() {
-  const [expenseList, setExpenseList] = useState<ExpenseProps[]>([]);
+  const [expenseList, setExpenseList] = useState<ExpenseProps[]>(mockExpenses);
 
   const [selectedCategory, setSelectedCategory] = useState<
     ExpenseCategory | "all"
@@ -45,23 +49,21 @@ function App() {
     setSelectedDate(undefined);
   };
 
+  const onAddExpense = async (formData: AddExpenseForm) => {
+    console.log(formData);
+  };
+
   const onEdit = async () => {};
   const onRemove = async () => {};
-
-  useEffect(() => {
-    // Mock data
-    setExpenseList(mockExpenses);
-  }, []);
 
   return (
     <>
       <div className="p-10 flex flex-col items-center justify-center gap-6 bg-radial-[at_50%_75%] from-sky-200 via-blue-400 to-indigo-900 to-90% min-w-full min-h-screen">
         <h1>Expense Tracker</h1>
 
-        {/* <AddExpenseModal /> */}
+        <AddExpenseModal onAddExpense={onAddExpense} />
 
         <div className="w-full flex flex-row flex-wrap items-center gap-2 mt-10 max-w-360">
-          {/* TODO: Filter by date and category and pagination */}
           <ExpenseFilter
             selectedCategory={selectedCategory}
             onCategoryChange={setSelectedCategory}
