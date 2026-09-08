@@ -6,3 +6,11 @@ export function formatDate(date: Date | string): string {
     day: "2-digit",
   });
 }
+
+export function formatRupiah(amount: number): string {
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+  }).format(amount);
+}

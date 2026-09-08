@@ -90,7 +90,19 @@ export function AddExpenseModal({ onAddExpense }: AddExpenseProps) {
           <FieldGroup className="my-6">
             <Field>
               <Label htmlFor="amount">Amount</Label>
-              <Input id="amount" name="amount" defaultValue="0" required />
+              <Input
+                id="amount"
+                name="amount"
+                defaultValue={0}
+                value={formData.amount}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    amount: Number(e.target.value),
+                  }))
+                }
+                required
+              />
             </Field>
 
             <Field>
@@ -154,7 +166,15 @@ export function AddExpenseModal({ onAddExpense }: AddExpenseProps) {
 
             <Field>
               <Label htmlFor="notes">Notes</Label>
-              <Input id="notes" name="notes" />
+              <Input
+                id="notes"
+                name="notes"
+                value={formData.notes}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, notes: e.target.value }))
+                }
+                required
+              />
             </Field>
           </FieldGroup>
           <DialogFooter>

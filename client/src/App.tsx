@@ -4,8 +4,9 @@ import {
   ExpenseCategory,
   type ExpenseProps,
   type AddExpenseForm,
+  type sortType,
 } from "@/types/expense";
-import { formatDate } from "@/utils/formatDate";
+import { formatDate, formatRupiah } from "@/utils/formatters";
 import { mockExpenses } from "@/data/mockExpenses";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +22,8 @@ function App() {
   >("all");
 
   const [selectedDate, setSelectedDate] = useState<DateRange | undefined>();
+
+  const [selectedSort, setSelectedSort] = useState<sortType | "all">("all");
 
   const displayExpenseList = useMemo(() => {
     let list = expenseList;
@@ -41,8 +44,26 @@ function App() {
       });
     }
 
+    if (selectedSort === "amount_asc") {
+      list = list.toSorted((a, b) => a.amount - b.amount);
+    } else if (selectedSort === "amount_desc") {
+      list = list.toSorted((a, b) => b.amount - a.amount);
+    } else if (selectedSort === "date_asc") {
+      list = list.toSorted(
+        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+      );
+    } else if (selectedSort === "date_desc") {
+      list = list.toSorted(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+      );
+    }
+
     return list;
-  }, [expenseList, selectedCategory, selectedDate]);
+  }, [expenseList, selectedCategory, selectedDate, selectedSort]);
+
+  const totalExpenses = useMemo(() => {
+    return displayExpenseList.reduce((total, item) => total + item.amount, 0);
+  }, [displayExpenseList]);
 
   const onResetFilters = () => {
     setSelectedCategory("all");
@@ -50,7 +71,8 @@ function App() {
   };
 
   const onAddExpense = async (formData: AddExpenseForm) => {
-    console.log(formData);
+    const mockId = expenseList.length + 1;
+    setExpenseList((prev) => [...prev, { ...formData, id: mockId }]);
   };
 
   const onEdit = async () => {};
@@ -61,6 +83,8 @@ function App() {
       <div className="p-10 flex flex-col items-center justify-center gap-6 bg-radial-[at_50%_75%] from-sky-200 via-blue-400 to-indigo-900 to-90% min-w-full min-h-screen">
         <h1>Expense Tracker</h1>
 
+        <h2>Total Expense: {formatRupiah(totalExpenses)}</h2>
+
         <AddExpenseModal onAddExpense={onAddExpense} />
 
         <div className="w-full flex flex-row flex-wrap items-center gap-2 mt-10 max-w-360">
@@ -69,6 +93,8 @@ function App() {
             onCategoryChange={setSelectedCategory}
             selectedDate={selectedDate}
             onDateChange={setSelectedDate}
+            selectedSort={selectedSort}
+            onSortChange={setSelectedSort}
             onResetFilters={onResetFilters}
           />
 
@@ -89,7 +115,7 @@ function App() {
                     <Badge variant="secondary">{expense.category}</Badge>
                   </div>
 
-                  <h4>Amount: {expense.amount}</h4>
+                  <h4>Amount: {formatRupiah(expense.amount)}</h4>
 
                   <div className="flex flex-row gap-2 items-center">
                     <Button variant="default" onClick={onEdit}>
