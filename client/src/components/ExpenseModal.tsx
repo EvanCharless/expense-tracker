@@ -9,7 +9,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -29,21 +28,40 @@ import { Field, FieldGroup } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ChevronDownIcon } from "lucide-react";
-import { ExpenseCategory, type AddExpenseForm } from "@/types/expense";
+import {
+  ExpenseCategory,
+  type ExpenseFormData,
+  type ExpenseProps,
+} from "@/types/expense";
 
-type AddExpenseProps = {
-  onAddExpense: (data: AddExpenseForm) => void;
+type ExpenseModalProps = {
+  open: boolean;
+  expenseData: ExpenseProps | null;
+  onOpenChange: (isOpen: boolean) => void;
+  onAddExpense: (payload: ExpenseFormData) => void;
+  onEditExpense: (id: ExpenseProps["id"], payload: ExpenseFormData) => void;
 };
 
-export function AddExpenseModal({ onAddExpense }: AddExpenseProps) {
-  const [open, setOpen] = useState<boolean>(false);
-
+export function ExpenseModal({
+  open,
+  expenseData,
+  onOpenChange,
+  onAddExpense,
+  onEditExpense,
+}: ExpenseModalProps) {
   // TODO: Add validation, such as required
-  const [formData, setFormData] = useState<AddExpenseForm>({
-    amount: 0,
-    category: ExpenseCategory.Others,
-    date: new Date(),
-    notes: "",
+  const [formData, setFormData] = useState<ExpenseFormData>(() => {
+    if (expenseData) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { id, ...existingData } = expenseData;
+      return existingData;
+    }
+    return {
+      amount: 0,
+      category: ExpenseCategory.Others,
+      date: new Date(),
+      notes: "",
+    };
   });
 
   const categories = useMemo(
@@ -55,33 +73,25 @@ export function AddExpenseModal({ onAddExpense }: AddExpenseProps) {
     [],
   );
 
-  return (
-    <Dialog
-      open={open}
-      onOpenChange={(open) => {
-        if (open) {
-          setFormData({
-            amount: 0,
-            category: ExpenseCategory.Others,
-            date: new Date(),
-            notes: "",
-          });
-        }
-        setOpen(open);
-      }}
-    >
-      <DialogTrigger render={<Button variant="outline">Add Expense</Button>} />
+  const isEditMode = expenseData?.id;
 
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-sm">
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            onAddExpense(formData);
-            setOpen(false);
+            if (isEditMode) {
+              onEditExpense(expenseData.id, formData);
+            } else {
+              onAddExpense(formData);
+            }
           }}
         >
           <DialogHeader>
-            <DialogTitle className="text-black!">Add Expense</DialogTitle>
+            <DialogTitle className="text-black!">
+              {isEditMode ? "Edit" : "Add"} Expense
+            </DialogTitle>
             <DialogDescription>
               Enter the details of your expense below.
             </DialogDescription>

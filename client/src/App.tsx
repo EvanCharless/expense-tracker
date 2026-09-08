@@ -3,14 +3,14 @@ import { CalendarDays, Pencil, Trash } from "lucide-react";
 import {
   ExpenseCategory,
   type ExpenseProps,
-  type AddExpenseForm,
+  type ExpenseFormData,
   type sortType,
 } from "@/types/expense";
 import { formatDate, formatRupiah } from "@/utils/formatters";
 import { mockExpenses } from "@/data/mockExpenses";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { AddExpenseModal } from "@/components/AddExpenseModal";
+import { ExpenseModal } from "@/components/ExpenseModal";
 import { ExpenseFilter } from "@/components/ExpenseFilter";
 import { type DateRange } from "react-day-picker";
 
@@ -20,10 +20,13 @@ function App() {
   const [selectedCategory, setSelectedCategory] = useState<
     ExpenseCategory | "all"
   >("all");
-
   const [selectedDate, setSelectedDate] = useState<DateRange | undefined>();
-
   const [selectedSort, setSelectedSort] = useState<sortType | "all">("all");
+
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const [selectedExpense, setSelectedExpense] = useState<ExpenseProps | null>(
+    null,
+  );
 
   const displayExpenseList = useMemo(() => {
     let list = expenseList;
@@ -70,13 +73,34 @@ function App() {
     setSelectedDate(undefined);
   };
 
-  const onAddExpense = async (formData: AddExpenseForm) => {
+  const showAddExpenseDialog = () => {
+    setSelectedExpense(null);
+    setIsDialogOpen(true);
+  };
+
+  const showEditExpenseDialog = async (expense: ExpenseProps) => {
+    setSelectedExpense(expense);
+    setIsDialogOpen(true);
+  };
+
+  const onAddExpense = async (formData: ExpenseFormData) => {
     const mockId = expenseList.length + 1;
     setExpenseList((prev) => [...prev, { ...formData, id: mockId }]);
   };
 
-  const onEdit = async () => {};
-  const onRemove = async () => {};
+  const onEditExpense = async (
+    id: ExpenseProps["id"],
+    formData: ExpenseFormData,
+  ) => {
+    setExpenseList((prev) =>
+      prev.map((item) => (item.id === id ? { ...formData, id } : item)),
+    );
+    setIsDialogOpen(false);
+  };
+
+  const onRemove = async (expense: ExpenseProps) => {
+    setExpenseList((prev) => prev.filter((item) => item.id !== expense.id));
+  };
 
   return (
     <>
@@ -85,7 +109,7 @@ function App() {
 
         <h2>Total Expense: {formatRupiah(totalExpenses)}</h2>
 
-        <AddExpenseModal onAddExpense={onAddExpense} />
+        <Button onClick={showAddExpenseDialog}>Add Expense</Button>
 
         <div className="w-full flex flex-row flex-wrap items-center gap-2 mt-10 max-w-360">
           <ExpenseFilter
@@ -118,11 +142,14 @@ function App() {
                   <h4>Amount: {formatRupiah(expense.amount)}</h4>
 
                   <div className="flex flex-row gap-2 items-center">
-                    <Button variant="default" onClick={onEdit}>
+                    <Button
+                      variant="default"
+                      onClick={() => showEditExpenseDialog(expense)}
+                    >
                       <Pencil data-icon="inline-start" /> Edit
                     </Button>
 
-                    <Button variant="default" onClick={onRemove}>
+                    <Button variant="default" onClick={() => onRemove(expense)}>
                       <Trash data-icon="inline-start" /> Remove
                     </Button>
                   </div>
@@ -132,6 +159,15 @@ function App() {
           })}
         </div>
       </div>
+
+      <ExpenseModal
+        key={selectedExpense?.id ?? "new"}
+        open={isDialogOpen}
+        expenseData={selectedExpense}
+        onOpenChange={setIsDialogOpen}
+        onAddExpense={onAddExpense}
+        onEditExpense={onEditExpense}
+      />
     </>
   );
 }
