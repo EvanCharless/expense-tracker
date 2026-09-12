@@ -13,7 +13,7 @@ import ExpenseFilters from "@/components/expense/ExpenseFilters";
 import ExpenseDialog from "@/components/expense/ExpenseDialog";
 import { type DateRange } from "react-day-picker";
 
-function ExpensesPage() {
+export function ExpensesPage() {
   const [expenseList, setExpenseList] = useState<ExpenseProps[]>(mockExpenses);
 
   const [selectedCategory, setSelectedCategory] = useState<
@@ -54,7 +54,7 @@ function ExpensesPage() {
       list = list.toSorted(
         (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
       );
-    } else if (selectedSort === "date_desc") {
+    } else {
       list = list.toSorted(
         (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
       );
@@ -89,6 +89,12 @@ function ExpensesPage() {
   const onAddExpense = async (formData: ExpenseFormData) => {
     const mockId = expenseList.length + 1;
     setExpenseList((prev) => [...prev, { ...formData, id: mockId }]);
+    resetDialog();
+  };
+
+  const resetDialog = () => {
+    setIsDialogOpen(false);
+    setSelectedExpense(null);
   };
 
   const onEditExpense = async (
@@ -98,7 +104,7 @@ function ExpensesPage() {
     setExpenseList((prev) =>
       prev.map((item) => (item.id === id ? { ...formData, id } : item)),
     );
-    setIsDialogOpen(false);
+    resetDialog();
   };
 
   return (
@@ -140,5 +146,3 @@ function ExpensesPage() {
     </>
   );
 }
-
-export default ExpensesPage;
