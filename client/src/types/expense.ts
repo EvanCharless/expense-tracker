@@ -27,7 +27,7 @@ export type ExpenseFormData = {
   amount: number;
   category: ExpenseCategory;
   date: Date;
-  notes: string;
+  notes?: string;
 }
 
 

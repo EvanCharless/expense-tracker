@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { format } from "date-fns";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -74,11 +74,7 @@ export function ExpenseModal({
   onAddExpense,
   onEditExpense,
 }: ExpenseModalProps) {
-  const form = useForm<FormValues>({
-    // Type mismatch warning (input: unknown, output: number) originates from
-    // z.coerce.number() in formSchema — known type inference issue with
-    // zod's coerce types + zodResolver. Explicit FormValues generic on
-    // useForm<FormValues> resolves it; see z.coerce docs if it recurs.
+  const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: (() => {
       if (expenseData) {
@@ -96,6 +92,8 @@ export function ExpenseModal({
     // Note:
     // IIFE (Immediately Invoked Function Expression) — a function defined and called immediately in the same expression.
     // () at the end — immediately calls that function
+    mode: "onSubmit",
+    reValidateMode: "onChange",
   });
 
   const { control, handleSubmit } = form;
@@ -117,6 +115,10 @@ export function ExpenseModal({
     if (isEditMode) onEditExpense(expenseData.id, values);
     else onAddExpense(values);
   };
+
+  useEffect(() => {
+    if (form) form.reset();
+  }, [form]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -140,6 +142,7 @@ export function ExpenseModal({
                   <FieldLabel htmlFor="amount">Amount</FieldLabel>
                   <Input
                     {...field}
+                    value={field.value as number}
                     id="amount"
                     type="number"
                     aria-invalid={fieldState.invalid}
