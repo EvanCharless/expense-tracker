@@ -36,7 +36,7 @@ type ExpenseFilterProps = {
   onResetFilters: () => void;
 };
 
-export function ExpenseFilter({
+function ExpenseFilters({
   selectedCategory,
   onCategoryChange,
   selectedDate,
@@ -160,3 +160,5 @@ export function ExpenseFilter({
     </div>
   );
 }
+
+export default ExpenseFilters;

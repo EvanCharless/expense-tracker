@@ -3,7 +3,7 @@ export type ExpenseProps = {
   amount: number;
   category: ExpenseCategory;
   date: Date;
-  notes: string;
+  notes?: string;
 };
 
 export const ExpenseCategory = {
@@ -18,18 +18,12 @@ export const ExpenseCategory = {
 
 export type ExpenseCategory = (typeof ExpenseCategory)[keyof typeof ExpenseCategory];
 
-export const CATEGORY_LABELS = Object.fromEntries(
-  Object.entries(ExpenseCategory).map(([key, value]) => [value, key])
-) as Record<ExpenseCategory, string>;
-
-
 export type ExpenseFormData = {
   amount: number;
   category: ExpenseCategory;
   date: Date;
   notes?: string;
 }
-
 
 export const SORT_OPTIONS = [
   { label: "Amount: Low to High", value: "amount_asc" },

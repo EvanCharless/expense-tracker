@@ -8,6 +8,7 @@ import {
   type SubmitHandler,
 } from "react-hook-form";
 import * as z from "zod";
+import { formSchema } from "@/schemas/expense-schema";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -55,19 +56,9 @@ type ExpenseModalProps = {
   onEditExpense: (id: ExpenseProps["id"], payload: ExpenseFormData) => void;
 };
 
-const formSchema = z.object({
-  amount: z.coerce.number().positive("Amount must be greater than 0"),
-  category: z.enum(
-    Object.values(ExpenseCategory) as [ExpenseCategory, ...ExpenseCategory[]],
-    { message: "Please select a category" },
-  ),
-  date: z.date({ message: "Date is required" }),
-  notes: z.string().max(200, "Notes must be under 200 characters").optional(),
-});
-
 type FormValues = z.infer<typeof formSchema>;
 
-export function ExpenseModal({
+function ExpenseDialog({
   open,
   expenseData,
   onOpenChange,
@@ -255,3 +246,5 @@ export function ExpenseModal({
     </Dialog>
   );
 }
+
+export default ExpenseDialog;
