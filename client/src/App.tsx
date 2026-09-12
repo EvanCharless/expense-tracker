@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { CalendarDays, Pencil, Trash } from "lucide-react";
 import {
   ExpenseCategory,
+  CATEGORY_LABELS,
   type ExpenseProps,
   type ExpenseFormData,
   type sortType,
@@ -136,7 +137,9 @@ function App() {
 
                   <div className="flex flex-col items-start gap-2">
                     <h3>{expense.notes || "Untitled"}</h3>
-                    <Badge variant="secondary">{expense.category}</Badge>
+                    <Badge variant="secondary">
+                      {CATEGORY_LABELS[expense.category]}
+                    </Badge>
                   </div>
 
                   <h4>Amount: {formatRupiah(expense.amount)}</h4>
